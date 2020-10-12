@@ -30,7 +30,7 @@ describe("Test User class", function () {
   });
 
   test("can authenticate", async function () {
-    debugger
+    // debugger
     let isValid = await User.authenticate("test", "password");
     expect(isValid).toBeTruthy();
 

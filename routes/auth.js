@@ -39,7 +39,7 @@ router.post('/login', async (req, res, next) => {
  */
 router.post('/register', async (req, res, next) => {
   try {
-    debugger;    
+    // debugger;    
     const {username, password} = req.body;
     if (!username || !password) {
       throw new ExpressError("UserName and password required", 400);

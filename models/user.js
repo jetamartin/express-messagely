@@ -39,23 +39,13 @@ class User {
   /** Authenticate: is this username/password valid? Returns boolean. */
 
   static async authenticate(username, password) { 
-    debugger;
     // Look up user in DB 
-     try {
-      const result = await db.query(
-        `SELECT password FROM users WHERE username=$1`, [username]
-      )
-      let user = result.rows[0]
-      if (user) {
-        if (await bcrypt.compare(password, user.password) === true) {
-          return true;
-        } 
-      }
-      return new ExpressError("Invalid user/password", 400);
 
-    } catch (error) {
-      return error
-    }
+    const result = await db.query(
+      `SELECT password FROM users WHERE username=$1`, [username]
+    )
+    let user = result.rows[0]
+    return user && await bcrypt.compare(password, user.password)
 
   }
 
@@ -84,7 +74,6 @@ class User {
 
   static async all() { 
     try {
-      debugger;
       const results = await db.query(
         `SELECT username, first_name, last_name, phone
          FROM users
@@ -168,34 +157,34 @@ class User {
    */
 
   static async messagesTo(username) { 
+    // debugger;
     const result = await db.query(
       `SELECT m.id,
-              m.from_user,
+              m.from_username,
               u.first_name,
               u.last_name,
               u.phone,
               m.body,
-              m.sent_at
+              m.sent_at,
+              m.read_at
         FROM messages AS m
-        JOIN users as u ON m.from_username = u.username
-        WHERE username = $1`
+        JOIN users AS u ON m.from_username = u.username
+        WHERE to_username = $1`,
         [username]);
+    // debugger;
     return result.rows.map(m => ({
       id: m.id,
-      
       from_user: {
-        first_name : u.first_name,
-        last_name : u.last_name,
-        phone: u.phone
+        username: m.from_username,
+        first_name : m.first_name,
+        last_name :m.last_name,
+        phone: m.phone
        },
       body: m.body,
       sent_at: m.sent_at,
       read_at: m.read_at
-
     }));
-
-
-    
+   
   }
 }
 
